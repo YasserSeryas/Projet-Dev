@@ -1,5 +1,3 @@
-//export var readline = require("readline-sync"); //lecture saisie du clavier
-
 var ligne1=[0,0,0] 
 var ligne2=[0,0,0] 
 var ligne3=[0,0,0] 
