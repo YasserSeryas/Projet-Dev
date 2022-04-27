@@ -9,6 +9,7 @@ io.on('connection', (socket) => {
     socket.on('message',(evt)=>{
         console.log(evt)
         socket.broadcast.emit('message',evt)
+       
     })
 })
 io.on('disconnect', (evt) => {
@@ -32,11 +33,13 @@ socket.on('disconnect',function(){
 })
 socket.on('message',data => {
     console.log(chalk.green(data.split('\n')[0]));
+    console.log("à vous de jouer");
 })
 repl.start({
     prompt:'',
     eval:(data) =>{
         socket.send(data)
+        console.log("Bien reçu attendez s\' il vous plait votre tour");
     }
 })
  }
