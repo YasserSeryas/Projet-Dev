@@ -1,8 +1,8 @@
-var ligne1=[0,0,0] 
-var ligne2=[0,0,0] 
-var ligne3=[0,0,0] 
+var line1=[0,0,0] 
+var line2=[0,0,0] 
+var line3=[0,0,0] 
     
-export var tab=[ligne1,ligne2,ligne3];
+export var tab=[line1,line2,line3]; // tableau à double dimension
 
 export function grid(tab)
 {
@@ -13,7 +13,19 @@ export function grid(tab)
         for(var j=0; j < tab[i].length; j++) // | | --> à chaque case (0)
         {
 
-            design +="| |";
+            if (tab[i][j] === 0) //condition qui vérifie si des valeur on été saisie, si 0 valeur saisie --> on ajoute pas de X ni de O
+            {
+                design +="| |"; //concaténation
+            }
+            else if (tab[i][j] === 1) //condition qui vérifie si des valeur on été saisie, joueur 1 à saisie une valeur --> on ajoute X à la position donnée 
+            {
+                design +="|X|";
+            }
+
+            else if (tab[i][j] === 2) 
+            {
+                design +="|O|";
+            }
 
         }
 
