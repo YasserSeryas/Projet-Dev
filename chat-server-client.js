@@ -1,37 +1,79 @@
-const { connect } = require('http2');
 
-// grid      
-var ligne1=[0,0,0] 
-var ligne2=[0,0,0] 
-var ligne3=[0,0,0] 
-    
- var tab=[ligne1,ligne2,ligne3];
+import readline from "readline-sync"; //lecture saisie du clavier
+import http from "http";
+import {Server,Socket} from "socket.io";
+import mysql from "mysql";
+import { grid, tab } from './morpion/grid.js'; //importation de la grille et du tableau dans le fichier grid.js
+import { switchPlayer, turn } from './morpion/switchPlayer.js';
+import { verifyPosition } from "./morpion/verifyPosition.js";
+import { victoryCondition } from "./morpion/victoryCondition.js";
+import client from "socket.io-client";
+// var socket = require('socket.io-client')(server);
+import repl from "repl";
+// const repl = require('repl');
+// const chalk = require('chalk');
+import chalk from "chalk";
+// const { use } = require('express/lib/application');
 
- function grid(tab)
-{
-    for(var i=0; i < tab.length; i++) //accès aux lignes 1, 2, 3
-    {
-        var design ="";
-    
-        for(var j=0; j < tab[i].length; j++) // | | --> à chaque case (0)
-        {
-
-            design +="| |";
-
-        }
-
-        console.log(design);
-
-    }
-} 
 /////game 
+let end = false;
+let nbtour= 9;
+
 function game()
 {
-    grid(tab);
+    grid(tab); // éxecution de la grille
+
+    while(!end)
+    {
+        let position = false;
+        
+        while(!position)
+        {
+            console.log("Où placez-vous votre morpion ?");
+            var inputLine = parseInt(readline.question("Line : ")); //insérer une valeur sur la ligne voulu
+            var inputColumn = parseInt(readline.question("Column : ")); //insérer une valeur sur la colonne voulu
+            position = verifyPosition(inputColumn, inputLine, tab);
+
+            if(!position)
+            {
+                console.log("----------------------------")
+                console.log("Choisir une position valide");
+                console.log("----------------------------")
+            }
+        }
+
+        nbtour--;
+        tab[inputLine-1][inputColumn-1] = turn; //valeur que le joueur numéro 1 saisie, -1 --> car tableau commence indice 0 
+        switchPlayer();
+        grid(tab); //on réexécute le tableau pour mettre à jour les valeur
+        end = victoryCondition();
+
+        if(end)
+        {
+            if(turn===1)
+            {
+                console.log("Joueur O vous avez gagné !");
+            }
+
+            if(turn===2)
+            {
+                console.log("Joueur X vous avez gagné !");
+            }
+            return;
+        }
+
+        if(nbtour==0)
+        {
+            console.log("Egalité !");
+            return;
+        }
+    }
 }
+ 
+
+
 // Databased function 
 function connectdb(){
-    const mysql =require('mysql');
     const db = mysql.createConnection({
 
     host: "localhost",
@@ -50,7 +92,7 @@ function connectdb(){
    db.query("CREATE DATABASE mabddjs", function (err, result) {
         if (err){
             console.log("La base de données MySQL existe déjà");
-            sql ="INSERT INTO `game`(`pseudo`) VALUES (?)"
+            let sql ="INSERT INTO `game`(`pseudo`) VALUES (?)";
             db.query(sql,pseudo);
         
         
@@ -71,7 +113,6 @@ function connectdb(){
   });
 } 
 function delete_data(){
-    const mysql =require('mysql');
     const db = mysql.createConnection({
 
     host: "localhost",
@@ -98,12 +139,13 @@ function delete_data(){
 
 /////////////////////////////// Network /////////////////////////////////////////
 if (process.argv[2]=="server") {
-const http = require('http').createServer();
-const io = require('socket.io')(http);
+
+const http_s = http.createServer();
+const io = new Server(http_s);
 const port = 3000
 var connectionsLimit = 2;
 
-http.listen(port, ()=>console.log(`Serveur en ecoute sur le port : ${port}`));
+http_s.listen(port, ()=>console.log(`Serveur en ecoute sur le port : ${port}`));
 io.on('connection', (socket) => {
     // limit the number of connections
     if (io.engine.clientsCount > connectionsLimit) {
@@ -117,6 +159,7 @@ io.on('connection', (socket) => {
     
    
     socket.on('message',(evt)=>{
+        
         console.log(evt)
         socket.broadcast.emit('message',evt)
        
@@ -128,17 +171,15 @@ io.on('disconnect', (evt) => {
 })}
  if (process.argv[2]=="client") {
 var server = 'http://localhost:3000';
-var socket = require('socket.io-client')(server);
-const repl = require('repl');
-const chalk = require('chalk');
-const { use } = require('express/lib/application');
+var socket = client(server);
+
 // var username=null;
 
 socket.on('connect',()=>{
    connectdb();
     console.log(chalk.red('# Le jeu a commencé #'))
     
-    game();
+   grid(tab);
     // username = process.argv[3]
 })
 
@@ -150,7 +191,7 @@ socket.on('disconnect',function(){
 socket.on('message',data => {
     console.log(chalk.green(data.split('\n')[0]));
     console.log("à vous de jouer");
-    game();
+    grid(tab);
    
 })
 repl.start({
@@ -158,7 +199,7 @@ repl.start({
     eval:(data) =>{
         socket.send(data)
         console.log("Attendez votre tour");
-        game();
+        grid(tab);
         if(data.split('\n')[0]==0){
         
             socket.emit('disconnect');
