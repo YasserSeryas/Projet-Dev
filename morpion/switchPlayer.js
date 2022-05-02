@@ -1,4 +1,4 @@
-export var turn = 1;
+export let turn = 1;
 
 export function switchPlayer() // permet de changer de joueur à chaque tour
 {
@@ -8,5 +8,4 @@ export function switchPlayer() // permet de changer de joueur à chaque tour
     }else{
         turn=1
     }
-
-}1
+}

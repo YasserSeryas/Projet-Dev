@@ -8,5 +8,4 @@ export function verifyPosition(inputColumn, inputLine, tab)
     }else{
         return false;
     }
-
 }
