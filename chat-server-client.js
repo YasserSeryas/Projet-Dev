@@ -155,15 +155,18 @@ io.on('connection', (socket) => {
         return
       }else {
           console.log('connected')
+         
+         
       }
-    
    
+    
     socket.on('message',(evt)=>{
         
         console.log(evt)
         socket.broadcast.emit('message',evt)
        
     })
+
 })
 io.on('disconnect', (evt) => {
     console.log('disconnected')
@@ -192,6 +195,7 @@ socket.on('message',data => {
     console.log(chalk.green(data.split('\n')[0]));
     console.log("à vous de jouer");
     grid(tab);
+    game();
    
 })
 repl.start({
