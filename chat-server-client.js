@@ -1,5 +1,5 @@
 
-import readline from "readline-sync"; //lecture saisie du clavier
+import readline from "node:readline/promises"; //lecture saisie du clavier
 import http from "http";
 import {Server,Socket} from "socket.io";
 import mysql from "mysql";
@@ -14,12 +14,12 @@ import repl from "repl";
 // const chalk = require('chalk');
 import chalk from "chalk";
 // const { use } = require('express/lib/application');
-
+var rl = readline.createInterface(process.stdin, process.stdout);
 /////game 
 let end = false;
 let nbtour= 9;
 
-function game()
+async function game()
 {
     grid(tab); // éxecution de la grille
 
@@ -30,8 +30,10 @@ function game()
         while(!position)
         {
             console.log("Où placez-vous votre morpion ?");
-            var inputLine = parseInt(readline.question("Line : ")); //insérer une valeur sur la ligne voulu
-            var inputColumn = parseInt(readline.question("Column : ")); //insérer une valeur sur la colonne voulu
+            var inputLine = parseInt(await rl.question("Line : ")); //insérer une valeur sur la ligne voulu
+            console.log("");
+            var inputColumn = parseInt(await rl.question("Column : "))
+            console.log("");; //insérer une valeur sur la colonne voulu
             position = verifyPosition(inputColumn, inputLine, tab);
 
             if(!position)
