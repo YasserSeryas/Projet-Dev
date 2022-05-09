@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-//lecture saisie du clavier
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const mysql_1 = __importDefault(require("mysql"));
@@ -82,8 +81,8 @@ function delete_data() {
         }
     });
 }
-/////////////////////////////// Network /////////////////////////////////////////
-// Server
+/////////////////////////////// Réseau /////////////////////////////////////////
+// Serveur
 if (process.argv[2] == "server") {
     const http_s = http_1.default.createServer();
     const io = new socket_io_1.Server(http_s);
@@ -92,7 +91,7 @@ if (process.argv[2] == "server") {
     create_bdd();
     http_s.listen(port, () => console.log(`Serveur en ecoute sur le port : ${port}`));
     io.on('connection', (socket) => {
-        // limit the number of connections
+        // limiter le nombre de connexion
         if (io.engine.clientsCount > connectionsLimit) {
             // @ts-ignore
             socket.emit({ message: 'reach the limit of connections' });
